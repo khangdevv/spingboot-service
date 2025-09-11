@@ -64,7 +64,7 @@ public class UserService {
     }
 
     //@PreAuthorize("hasRole('ADMIN')")
-    @PreAuthorize("hasAuthority('ADMIN')")// tao ra mot proxy de kiem tra quyen truoc khi thuc hien phuong thuc
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")// tao ra mot proxy de kiem tra quyen truoc khi thuc hien phuong thuc
     public List<UserResponse> findAllUsers() {
         log.info("In method findAllUsers of UserService");
         return userRepository.findAll().stream()
