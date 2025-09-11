@@ -1,16 +1,22 @@
 package com.spingboot_study.spingboot_service.exception;
 
 import com.spingboot_study.spingboot_service.dto.request.ApiResponse;
+import jakarta.validation.ConstraintViolation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @ControllerAdvice // This annotation indicates that this class will handle exceptions globally across all controllers
 public class GlobalExceptionHandler {
+
+    private static final String MIN_ATTRIBUTE = "min";
+
     @ExceptionHandler(value = Exception.class)// This method will handle all RuntimeExceptions thrown by controllers
     ResponseEntity<ApiResponse<Exception>> handlingRuntimeException(Exception ex) {
         ApiResponse<Exception> response = new ApiResponse<>();
@@ -51,16 +57,34 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = MethodArgumentNotValidException.class)// This method will handle all other exceptions
     ResponseEntity<ApiResponse<MethodArgumentNotValidException>> handlingMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         String enumKey = Objects.requireNonNull(ex.getFieldError()).getDefaultMessage();
+
         ErrorCode errorCode = ErrorCode.INVALID_KEY;
+
+        Map<String, Object> attributes = null;
+
         try {
             errorCode = ErrorCode.valueOf(enumKey);
+
+            var constraintViolations = ex.getBindingResult().getAllErrors().getFirst().unwrap(ConstraintViolation.class);
+
+            attributes = constraintViolations.getConstraintDescriptor().getAttributes();
+
         } catch (IllegalArgumentException e) {
             // If the enum key is not found, we can log it or handle it accordingly
             errorCode = ErrorCode.UNCATEGORIZED_EXCEPTION; // Fallback to uncategorized error
         }
+
         ApiResponse<MethodArgumentNotValidException> response = new ApiResponse<>();
+
         response.setCode(errorCode.getCode()); // HTTP status code for bad request
-        response.setMessage(errorCode.getMessage());
+        response.setMessage(Objects.nonNull(attributes) ?
+                mapAttributeToMessage(errorCode.getMessage(), attributes) : errorCode.getMessage());
+
         return ResponseEntity.badRequest().body(response);
+    }
+
+    private String mapAttributeToMessage(String message, Map<String, Object> attributes) {
+        String minValue = String.valueOf(attributes.get(MIN_ATTRIBUTE));
+        return message.replace("{" + MIN_ATTRIBUTE + "}", minValue);
     }
 }

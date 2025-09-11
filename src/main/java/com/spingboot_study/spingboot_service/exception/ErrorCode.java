@@ -19,7 +19,7 @@ public enum ErrorCode {
     TOKEN_EXPIRED(1006, "Token has expired", HttpStatus.UNAUTHORIZED),
     TOKEN_INVALID(1007, "Token is invalid", HttpStatus.BAD_REQUEST),
     UNAUTHORIZED(1010, "User is not authorized to perform this action", HttpStatus.FORBIDDEN),
-    DOB_INVALID(1011, "Date of birth is invalid or user is under the minimum age requirement", HttpStatus.BAD_REQUEST)
+    DOB_INVALID(1011, "Your age must be at least {min}", HttpStatus.BAD_REQUEST)
     ;
 
     private int code;
