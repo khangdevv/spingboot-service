@@ -4,6 +4,7 @@ import com.nimbusds.jose.JOSEException;
 import com.spingboot_study.spingboot_service.dto.request.ApiResponse;
 import com.spingboot_study.spingboot_service.dto.request.AuthenticationRequest;
 import com.spingboot_study.spingboot_service.dto.request.IntrospectRequest;
+import com.spingboot_study.spingboot_service.dto.request.LogoutRequest;
 import com.spingboot_study.spingboot_service.dto.response.AuthenticationResponse;
 import com.spingboot_study.spingboot_service.dto.response.IntrospectResponse;
 import com.spingboot_study.spingboot_service.exception.AppException;
@@ -34,6 +35,13 @@ public class AuthenticationController {
         var result = authenticationService.introspect(introspectRequest);
         return ApiResponse.<IntrospectResponse>builder()
                 .data(result)
+                .build();
+    }
+
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestBody LogoutRequest logoutRequest) throws AppException, ParseException, JOSEException {
+        authenticationService.logout(logoutRequest);
+        return ApiResponse.<Void>builder()
                 .build();
     }
 }
