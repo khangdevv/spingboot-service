@@ -46,10 +46,17 @@ public class AuthenticationService {
     public IntrospectResponse introspect(IntrospectRequest introspectRequest) throws AppException, JOSEException, ParseException {
         var token = introspectRequest.getToken();
 
-        var signedJWT = verifyToken(token);
+        boolean isValid = true;
+
+        try {
+            var signedJWT = verifyToken(token);
+        }
+        catch (AppException e) {
+            isValid = false;
+        }
 
         return IntrospectResponse.builder()
-                .valid(true)
+                .valid(isValid)
                 .build();
     }
 
@@ -93,6 +100,10 @@ public class AuthenticationService {
 
         if (!(verified && expityTime.after(new Date()))) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
+        if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())) {
+            throw  new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
         return signedJWT;

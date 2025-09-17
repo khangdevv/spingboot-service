@@ -1,6 +1,7 @@
 package com.spingboot_study.spingboot_service.configuration;
 
 import com.spingboot_study.spingboot_service.enums.Role;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -30,7 +31,7 @@ public class SecurityConfig {
             "/auth/logout"
     };
 
-    protected static final String STRING_KEY = "VkY6Of6HYxFWW5yydVr9A2nmZvyUbS6/KuuEyBPwavOCNOHS/3N+fufpubeT0mrT";
+    private CustomJwtDecoder customJwtDecoder;
 
     @Bean
     public SecurityFilterChain customerSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -45,7 +46,7 @@ public class SecurityConfig {
 //                .anyRequest().authenticated());
 
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer ->
-                jwtConfigurer.decoder(jwtDecoder())
+                jwtConfigurer.decoder(customJwtDecoder)
                     .jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
         );
@@ -62,13 +63,6 @@ public class SecurityConfig {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
     }
-
-    @Bean
-    JwtDecoder jwtDecoder() {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(STRING_KEY.getBytes(), "HS512");
-        return NimbusJwtDecoder.withSecretKey(secretKeySpec).
-        macAlgorithm(MacAlgorithm.HS512).build();
-    };
 
     @Bean
     PasswordEncoder passwordEncoder() {
