@@ -8,6 +8,7 @@ import com.nimbusds.jwt.SignedJWT;
 import com.spingboot_study.spingboot_service.dto.request.AuthenticationRequest;
 import com.spingboot_study.spingboot_service.dto.request.IntrospectRequest;
 import com.spingboot_study.spingboot_service.dto.request.LogoutRequest;
+import com.spingboot_study.spingboot_service.dto.request.RefreshRequest;
 import com.spingboot_study.spingboot_service.dto.response.AuthenticationResponse;
 import com.spingboot_study.spingboot_service.dto.response.IntrospectResponse;
 import com.spingboot_study.spingboot_service.entity.InvalidatedToken;
@@ -144,5 +145,28 @@ public class AuthenticationService {
             });
         }
         return scope.toString();
+    }
+
+    public AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
+        var signedJWT = verifyToken(request.getToken());
+
+        var jit = signedJWT.getJWTClaimsSet().getJWTID();
+        var exp = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                .id(jit)
+                .expiryTime(exp)
+                .build();
+
+        invalidatedTokenRepository.save(invalidatedToken);
+
+        var user = userRepository.findByUsername(signedJWT.getJWTClaimsSet().getSubject())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        var token = generateToken(user);
+        return AuthenticationResponse.builder()
+                .token(token)
+                .authenticated(true)
+                .build();
     }
 }

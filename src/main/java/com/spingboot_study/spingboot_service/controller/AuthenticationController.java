@@ -1,10 +1,7 @@
 package com.spingboot_study.spingboot_service.controller;
 
 import com.nimbusds.jose.JOSEException;
-import com.spingboot_study.spingboot_service.dto.request.ApiResponse;
-import com.spingboot_study.spingboot_service.dto.request.AuthenticationRequest;
-import com.spingboot_study.spingboot_service.dto.request.IntrospectRequest;
-import com.spingboot_study.spingboot_service.dto.request.LogoutRequest;
+import com.spingboot_study.spingboot_service.dto.request.*;
 import com.spingboot_study.spingboot_service.dto.response.AuthenticationResponse;
 import com.spingboot_study.spingboot_service.dto.response.IntrospectResponse;
 import com.spingboot_study.spingboot_service.exception.AppException;
@@ -42,6 +39,14 @@ public class AuthenticationController {
     ApiResponse<Void> logout(@RequestBody LogoutRequest logoutRequest) throws AppException, ParseException, JOSEException {
         authenticationService.logout(logoutRequest);
         return ApiResponse.<Void>builder()
+                .build();
+    }
+
+    @PostMapping("/refresh")
+    ApiResponse<AuthenticationResponse> refresh(@RequestBody RefreshRequest request) throws AppException, ParseException, JOSEException {
+        var result = authenticationService.refreshToken(request);
+        return ApiResponse.<AuthenticationResponse>builder()
+                .data(result)
                 .build();
     }
 }
