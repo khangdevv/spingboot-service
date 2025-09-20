@@ -1,10 +1,11 @@
 package com.spingboot_study.spingboot_service.service;
 
+import com.spingboot_study.spingboot_service.constant.PredefinedRole;
 import com.spingboot_study.spingboot_service.dto.request.UserCreationRequest;
 import com.spingboot_study.spingboot_service.dto.request.UserUpdationRequest;
 import com.spingboot_study.spingboot_service.dto.response.UserResponse;
+import com.spingboot_study.spingboot_service.entity.Role;
 import com.spingboot_study.spingboot_service.entity.User;
-import com.spingboot_study.spingboot_service.enums.Role;
 import com.spingboot_study.spingboot_service.exception.AppException;
 import com.spingboot_study.spingboot_service.exception.ErrorCode;
 import com.spingboot_study.spingboot_service.mapper.UserMapper;
@@ -55,16 +56,16 @@ public class UserService {
         User user = userMapper.toUser(request); // Convert request to User entity using mapper
         user.setPassword(passwordEncoder.encode(request.getPassword())); // Encrypt the password
 
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Role.USER.name()); // Default role for new users
+        HashSet<Role> roles = new HashSet<>();
+        roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
 
-        //user.setRoles(roles); // Set default roles
+        user.setRoles(roles); // Set default roles
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    //@PreAuthorize("hasRole('ADMIN')")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")// tao ra mot proxy de kiem tra quyen truoc khi thuc hien phuong thuc
+    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasAuthority('ROLE_ADMIN')")// tao ra mot proxy de kiem tra quyen truoc khi thuc hien phuong thuc
     public List<UserResponse> findAllUsers() {
         log.info("In method findAllUsers of UserService");
         return userRepository.findAll().stream()
@@ -78,6 +79,7 @@ public class UserService {
         return userMapper.toUserResponse(userRepository.findById(id).orElseThrow(()-> new RuntimeException("User not found with id: " + id)));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse updateUser(UserUpdationRequest request, String id) {
         User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("User not found with id: " + id));
         userMapper.updateUser(request, user);
@@ -89,6 +91,7 @@ public class UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteUserById(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));

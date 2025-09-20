@@ -2,6 +2,8 @@ package com.spingboot_study.spingboot_service.configuration;
 
 import com.nimbusds.jose.JOSEException;
 import com.spingboot_study.spingboot_service.dto.request.IntrospectRequest;
+import com.spingboot_study.spingboot_service.exception.AppException;
+import com.spingboot_study.spingboot_service.exception.ErrorCode;
 import com.spingboot_study.spingboot_service.service.AuthenticationService;
 import lombok.Value;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +34,7 @@ public class CustomJwtDecoder implements JwtDecoder {
             var response =  authenticationService.introspect(IntrospectRequest.builder().token(token).build());
 
             if (!response.isValid()) {
-                throw new JwtException("Invalid token");
+                throw new AppException(ErrorCode.TOKEN_INVALID);
             }
         }
         catch (JOSEException | ParseException e) {
@@ -40,10 +42,10 @@ public class CustomJwtDecoder implements JwtDecoder {
         }
 
         if (Objects.isNull(decoder)) {
-            SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HS512");
             decoder = NimbusJwtDecoder
                     .withSecretKey(secretKeySpec)
-                    .macAlgorithm(MacAlgorithm.HS256)
+                    .macAlgorithm(MacAlgorithm.HS512)
                     .build();
         }
 

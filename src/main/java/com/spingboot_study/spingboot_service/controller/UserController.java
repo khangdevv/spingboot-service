@@ -37,13 +37,6 @@ public class UserController {
     @GetMapping
     ApiResponse<List<UserResponse>> findAllUsers()
     {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        log.info("User {} is accessing the user list", authentication.getName());
-        authentication.getAuthorities().forEach(authority -> {
-            log.info("User has authority: {}", authority.getAuthority());
-        });
-
         return ApiResponse.<List<UserResponse>>builder()
                 .data(userService.findAllUsers())
                 .build();

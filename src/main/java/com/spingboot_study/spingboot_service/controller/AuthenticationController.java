@@ -8,6 +8,7 @@ import com.spingboot_study.spingboot_service.exception.AppException;
 import com.spingboot_study.spingboot_service.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -16,12 +17,14 @@ import java.text.ParseException;
 @RequestMapping("/auth") // base URL for authentication-related endpoints
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class AuthenticationController {
     AuthenticationService authenticationService;
 
     @PostMapping("/token")
     ApiResponse<AuthenticationResponse> login(@RequestBody AuthenticationRequest authenticationRequest) throws AppException {
         var result = authenticationService.authenticate(authenticationRequest);
+        log.info(result.toString());
         return ApiResponse.<AuthenticationResponse>builder()
                 .data(result)
                 .build();

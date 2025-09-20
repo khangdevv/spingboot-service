@@ -12,7 +12,7 @@ import org.mapstruct.MappingTarget;
 public interface UserMapper {
     User toUser(UserCreationRequest request);
 
-    @Mapping(target = "id", ignore = false) // Ignore id field during mapping
+    //@Mapping(target = "id", ignore = false) // Ignore id field during mapping
     UserResponse toUserResponse(User user);
 
     @Mapping(target = "roles", ignore = true) // Ignore roles field during mapping
