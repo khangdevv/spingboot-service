@@ -5,8 +5,9 @@ import com.spingboot_study.spingboot_service.dto.request.IntrospectRequest;
 import com.spingboot_study.spingboot_service.exception.AppException;
 import com.spingboot_study.spingboot_service.exception.ErrorCode;
 import com.spingboot_study.spingboot_service.service.AuthenticationService;
-import lombok.Value;
+import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -21,7 +22,9 @@ import java.util.Objects;
 @Component
 public class CustomJwtDecoder implements JwtDecoder {
 
-    private final String secretKey = "VkY6Of6HYxFWW5yydVr9A2nmZvyUbS6/KuuEyBPwavOCNOHS/3N+fufpubeT0mrT";
+    @NonFinal
+    @Value("${spring.jwt.signerKey}")
+    protected String STRING_KEY;
 
     @Autowired
     private AuthenticationService authenticationService;
@@ -42,7 +45,7 @@ public class CustomJwtDecoder implements JwtDecoder {
         }
 
         if (Objects.isNull(decoder)) {
-            SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HS512");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(STRING_KEY.getBytes(), "HS512");
             decoder = NimbusJwtDecoder
                     .withSecretKey(secretKeySpec)
                     .macAlgorithm(MacAlgorithm.HS512)
