@@ -1,16 +1,14 @@
 package com.spingboot_study.spingboot_service.controller;
 
 import com.nimbusds.jose.JOSEException;
-import com.spingboot_study.spingboot_service.dto.request.ApiResponse;
-import com.spingboot_study.spingboot_service.dto.request.AuthenticationRequest;
-import com.spingboot_study.spingboot_service.dto.request.IntrospectRequest;
-import com.spingboot_study.spingboot_service.dto.request.LogoutRequest;
+import com.spingboot_study.spingboot_service.dto.request.*;
 import com.spingboot_study.spingboot_service.dto.response.AuthenticationResponse;
 import com.spingboot_study.spingboot_service.dto.response.IntrospectResponse;
 import com.spingboot_study.spingboot_service.exception.AppException;
 import com.spingboot_study.spingboot_service.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -19,12 +17,14 @@ import java.text.ParseException;
 @RequestMapping("/auth") // base URL for authentication-related endpoints
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class AuthenticationController {
     AuthenticationService authenticationService;
 
     @PostMapping("/token")
     ApiResponse<AuthenticationResponse> login(@RequestBody AuthenticationRequest authenticationRequest) throws AppException {
         var result = authenticationService.authenticate(authenticationRequest);
+        log.info(result.toString());
         return ApiResponse.<AuthenticationResponse>builder()
                 .data(result)
                 .build();
@@ -42,6 +42,14 @@ public class AuthenticationController {
     ApiResponse<Void> logout(@RequestBody LogoutRequest logoutRequest) throws AppException, ParseException, JOSEException {
         authenticationService.logout(logoutRequest);
         return ApiResponse.<Void>builder()
+                .build();
+    }
+
+    @PostMapping("/refresh")
+    ApiResponse<AuthenticationResponse> refresh(@RequestBody RefreshRequest request) throws AppException, ParseException, JOSEException {
+        var result = authenticationService.refreshToken(request);
+        return ApiResponse.<AuthenticationResponse>builder()
+                .data(result)
                 .build();
     }
 }
