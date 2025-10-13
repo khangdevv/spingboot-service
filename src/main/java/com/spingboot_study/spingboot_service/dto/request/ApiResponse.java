@@ -9,8 +9,9 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@JsonInclude(JsonInclude.Include.NON_NULL) // This annotation ensures that null fields are not included in the JSON response
-public class ApiResponse <T> {
+@JsonInclude(
+        JsonInclude.Include.NON_NULL) // This annotation ensures that null fields are not included in the JSON response
+public class ApiResponse<T> {
     int code;
     String message;
     T data;

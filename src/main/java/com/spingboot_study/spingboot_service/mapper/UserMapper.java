@@ -12,10 +12,12 @@ import org.mapstruct.MappingTarget;
 public interface UserMapper {
     User toUser(UserCreationRequest request);
 
-    //@Mapping(target = "id", ignore = false) // Ignore id field during mapping
+    // @Mapping(target = "id", ignore = false) // Ignore id field during mapping
     UserResponse toUserResponse(User user);
 
     @Mapping(target = "roles", ignore = true) // Ignore roles field during mapping
-    void updateUser(UserUpdationRequest request, @MappingTarget User user); // Method to update an existing User entity with new data from UserCreationRequest
-
+    void updateUser(
+            UserUpdationRequest request,
+            @MappingTarget
+                    User user); // Method to update an existing User entity with new data from UserCreationRequest
 }
