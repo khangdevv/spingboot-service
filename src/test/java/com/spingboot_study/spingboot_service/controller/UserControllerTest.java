@@ -1,5 +1,7 @@
 package com.spingboot_study.spingboot_service.controller;
 
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.spingboot_study.spingboot_service.dto.request.UserCreationRequest;
@@ -18,8 +20,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import java.time.LocalDate;
 
 @SpringBootTest
 @Slf4j
@@ -63,19 +63,17 @@ public class UserControllerTest {
         Mockito.when(userService.createUser(ArgumentMatchers.any())).thenReturn(userResponse);
 
         // when
-        mockMvc.perform(MockMvcRequestBuilders
-                .post("/users")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(content)
-        ).andExpect(MockMvcResultMatchers.status().isOk()
-        ).andExpect(MockMvcResultMatchers.jsonPath("code").value(201)
-        );
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(201));
 
         // then
     }
 
     @Test
-        // Create User - Success
+    // Create User - Success
     void createUser_passwordInvalid_fail() throws Exception {
         // given
         userCreationRequest.setPassword("1234");
@@ -86,16 +84,13 @@ public class UserControllerTest {
         Mockito.when(userService.createUser(ArgumentMatchers.any())).thenReturn(userResponse);
 
         // when
-        mockMvc.perform(MockMvcRequestBuilders
-                .post("/users")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(content)
-        ).andExpect(MockMvcResultMatchers.status().isBadRequest()
-        ).andExpect(MockMvcResultMatchers.jsonPath("code").value(1003)
-        );
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(1003));
 
         // then
-
 
     }
 }

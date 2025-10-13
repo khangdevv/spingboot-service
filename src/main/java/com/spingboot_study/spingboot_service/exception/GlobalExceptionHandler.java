@@ -1,5 +1,8 @@
 package com.spingboot_study.spingboot_service.exception;
 
+import java.util.Map;
+import java.util.Objects;
+
 import com.spingboot_study.spingboot_service.dto.request.ApiResponse;
 import jakarta.validation.ConstraintViolation;
 import org.springframework.http.ResponseEntity;
@@ -8,16 +11,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
 @ControllerAdvice // This annotation indicates that this class will handle exceptions globally across all controllers
 public class GlobalExceptionHandler {
 
     private static final String MIN_ATTRIBUTE = "min";
 
-    @ExceptionHandler(value = Exception.class)// This method will handle all RuntimeExceptions thrown by controllers
+    @ExceptionHandler(value = Exception.class) // This method will handle all RuntimeExceptions thrown by controllers
     ResponseEntity<ApiResponse<Exception>> handlingRuntimeException(Exception ex) {
         ApiResponse<Exception> response = new ApiResponse<>();
         response.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode()); // HTTP status code for bad request
@@ -25,7 +24,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @ExceptionHandler(value = RuntimeException.class)// This method will handle all RuntimeExceptions thrown by controllers
+    @ExceptionHandler(
+            value = RuntimeException.class) // This method will handle all RuntimeExceptions thrown by controllers
     ResponseEntity<ApiResponse<RuntimeException>> handlingRuntimeException(RuntimeException ex) {
         ApiResponse<RuntimeException> response = new ApiResponse<>();
         response.setCode(400); // HTTP status code for bad request
@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @ExceptionHandler(value = AppException.class)// This method will handle all RuntimeExceptions thrown by controllers
+    @ExceptionHandler(value = AppException.class) // This method will handle all RuntimeExceptions thrown by controllers
     ResponseEntity<ApiResponse<AppException>> handlingAppException(AppException ex) {
         ErrorCode errorCode = ex.getErrorCode();
         ApiResponse<AppException> response = new ApiResponse<>();
@@ -46,16 +46,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = AccessDeniedException.class)
     ResponseEntity<ApiResponse<AccessDeniedException>> handlingAccessDeniedException(AccessDeniedException ex) {
         ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
-        return ResponseEntity.status(errorCode.getStatusCode()).body(
-                ApiResponse.<AccessDeniedException>builder()
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(ApiResponse.<AccessDeniedException>builder()
                         .code(errorCode.getCode())
                         .message(errorCode.getMessage())
-                        .build()
-        );
+                        .build());
     }
 
-    @ExceptionHandler(value = MethodArgumentNotValidException.class)// This method will handle all other exceptions
-    ResponseEntity<ApiResponse<MethodArgumentNotValidException>> handlingMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    @ExceptionHandler(value = MethodArgumentNotValidException.class) // This method will handle all other exceptions
+    ResponseEntity<ApiResponse<MethodArgumentNotValidException>> handlingMethodArgumentNotValidException(
+            MethodArgumentNotValidException ex) {
         String enumKey = Objects.requireNonNull(ex.getFieldError()).getDefaultMessage();
 
         ErrorCode errorCode = ErrorCode.INVALID_KEY;
@@ -65,7 +65,8 @@ public class GlobalExceptionHandler {
         try {
             errorCode = ErrorCode.valueOf(enumKey);
 
-            var constraintViolations = ex.getBindingResult().getAllErrors().getFirst().unwrap(ConstraintViolation.class);
+            var constraintViolations =
+                    ex.getBindingResult().getAllErrors().getFirst().unwrap(ConstraintViolation.class);
 
             attributes = constraintViolations.getConstraintDescriptor().getAttributes();
 
@@ -77,8 +78,10 @@ public class GlobalExceptionHandler {
         ApiResponse<MethodArgumentNotValidException> response = new ApiResponse<>();
 
         response.setCode(errorCode.getCode()); // HTTP status code for bad request
-        response.setMessage(Objects.nonNull(attributes) ?
-                mapAttributeToMessage(errorCode.getMessage(), attributes) : errorCode.getMessage());
+        response.setMessage(
+                Objects.nonNull(attributes)
+                        ? mapAttributeToMessage(errorCode.getMessage(), attributes)
+                        : errorCode.getMessage());
 
         return ResponseEntity.badRequest().body(response);
     }

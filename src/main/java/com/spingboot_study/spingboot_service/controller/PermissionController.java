@@ -1,5 +1,7 @@
 package com.spingboot_study.spingboot_service.controller;
 
+import java.util.List;
+
 import com.spingboot_study.spingboot_service.dto.request.ApiResponse;
 import com.spingboot_study.spingboot_service.dto.request.PermissionRequest;
 import com.spingboot_study.spingboot_service.dto.response.PermissionResponse;
@@ -9,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/permissions") // base URL for user-related endpoints

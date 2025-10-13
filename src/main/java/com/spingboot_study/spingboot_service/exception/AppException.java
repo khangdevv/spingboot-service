@@ -1,6 +1,5 @@
 package com.spingboot_study.spingboot_service.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
